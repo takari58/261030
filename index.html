@@ -64,7 +64,7 @@
             left-height:1.4;
             font-family:monospace;
         }
-        /* 羅針盤（矢印マーカー）のスタイル */
+        
         .compass-arrow {
             font-size: 32px;
             text-align: center;
@@ -75,7 +75,6 @@
 </head>
 <body>
 
-    <!-- 地図の上に重ねる操作パネル -->
     <div id="control-panel">
         <button id="compass-btn" onclick="toggleCompass()">コンパス開始</button>
         <div>
@@ -88,7 +87,6 @@
     <div id="map"></div>
 
     <script>
-        // 1. 地図の初期化（仮の初期位置）
         const map = L.map('map',{
             rotate: true,
             touchRotate: true,
@@ -97,7 +95,7 @@
 
         map.touchRotate.enable();
 
-        map.on('zoomed rotate',() => {
+        map.on('zoomend rotate',() => {
             map.invalidateSize();
         });
         
@@ -105,7 +103,6 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // 2. 矢印マーカーの作成
         const compassIcon = L.divIcon({
             html: '<div id="arrow" class="compass-arrow">⬆️</div>',
             className: 'custom-div-icon',
@@ -117,7 +114,6 @@
         let isTracking = false;
         let currentHeading = 0;
 
-        // 3. 現在地を取得して地図の初期位置にする
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(
                 (position) => {
@@ -146,7 +142,6 @@
             );
         }
 
-        // 4. センサー情報を取得して反映
         function handleOrientation(event) {
             // パネルの数値を更新
             document.getElementById('val-alpha').innerText = event.alpha ? event.alpha.toFixed(1) : '0.0';
@@ -172,7 +167,6 @@
             }
         }
 
-        // 5. ボタン連動処理
         function toggleCompass() {
             const btn = document.getElementById('compass-btn');
 
