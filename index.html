@@ -7,7 +7,7 @@
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https:/raruto.github.io/leaflet-rotate/dist/leaflet-rotate.js"></script>
+    <script src="https://raruto.github.io/leaflet-rotate/dist/leaflet-rotate.js"></script>
 
     <style>
         html, body {
@@ -92,21 +92,18 @@
         const map = L.map('map',{
             rotate: true,
             touchRotate: true,
-            rotateControl:{
-                closeOnZeroBearing; false
-            },
             bearing: 0
         }).setView([37.94413,139.33510], 16);
 
+        map.touchRotate.enable();
+
+        map.on('zoomed rotate',() => {
+            map.invalidateSize();
+        });
+        
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
-
-        map.touchRotate.enable();
-
-        map.on('aoomed rotate',() => {
-            map.invalidateSize();
-        });
 
         // 2. 矢印マーカーの作成
         const compassIcon = L.divIcon({
@@ -122,7 +119,7 @@
 
         // 3. 現在地を取得して地図の初期位置にする
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
+            navigator.geolocation.watchPosition(
                 (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
@@ -169,15 +166,11 @@
                 if (arrowDiv) {
                     arrowDiv.style.transform = `rotate(${heading}deg)`;
                 }
+                if(isTracking){
+                    map.setBearing(-heading);
+                }
             }
         }
-        if(isTracking){
-            map.setBearing(heading);
-        }
-
-        map.setBearing(-heading);
-        marker.setLatLng([lat,lng]);
-        map.panTo([lat,lng],{animate:false})
 
         // 5. ボタン連動処理
         function toggleCompass() {
