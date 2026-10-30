@@ -162,12 +162,12 @@
 
             if (heading !== null && marker) {
                 currentHeading = heading;
-                const arrowDiv = document.getElementById('arrow');
-                if (arrowDiv) {
-                    arrowDiv.style.transform = `rotate(${heading}deg)`;
-                }
                 if(isTracking){
                     map.setBearing(-heading);
+                    const arrowDiv = document.getElementById('arrow');
+                    if(arrowDiv){
+                        arrowDiv.style.transform = 'rotate(0deg)';
+                    }
                 }
             }
         }
