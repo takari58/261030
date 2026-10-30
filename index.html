@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-rotate@0.5.2/dist/leaflet-rotate.js"></script>
 
     <style>
         html, body {
@@ -18,11 +19,11 @@
             font-family:sans-serif;
         }
         #map {
-            width: 100%;
-            height: 100%;
             position: absolute;
-            top: 0;
-            left: 0;
+            width: 300vw;
+            height: 300vh;
+            top: -100vh;
+            left: -100vw;
             z-index: 1;
         }
         #control-panel{
@@ -88,11 +89,24 @@
 
     <script>
         // 1. 地図の初期化（仮の初期位置）
-        const map = L.map('map').setView([37.94413,139.33510], 16);
+        const map = L.map('map',{
+            rotate: true,
+            touchRotate: true,
+            rotateControl:{
+                closeOnZeroBearing; false
+            },
+            bearing: 0
+        }).setView([37.94413,139.33510], 16);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
+
+        map.touchRotate.enable();
+
+        map.on('aoomed rotate',() => {
+            map.invalidateSize();
+        });
 
         // 2. 矢印マーカーの作成
         const compassIcon = L.divIcon({
@@ -117,6 +131,11 @@
                         map.setView([lat,lng],17);
                     }else{
                         marker.setLatLng([lat,lng]);
+                        if(isTracking){
+                            map.panTo([lat,lng],{
+                                animate:false
+                            });
+                        }
                     }
                 },
                 (error) => {
@@ -152,6 +171,13 @@
                 }
             }
         }
+        if(isTracking){
+            map.setBearing(heading);
+        }
+
+        map.setBearing(-heading);
+        marker.setLatLng([lat,lng]);
+        map.panTo([lat,lng],{animate:false})
 
         // 5. ボタン連動処理
         function toggleCompass() {
